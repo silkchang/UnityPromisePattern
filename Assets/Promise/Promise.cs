@@ -1,54 +1,70 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class Promise : MonoBehaviour
 {
-	private List<PromiseUnitBase> mUnits = new List<PromiseUnitBase>();
-	[System.NonSerialized]
-	public List<System.Action> OnBegin = new List<System.Action>();
+    private List<PromiseUnitBase> mUnits = new List<PromiseUnitBase> ();
+    [System.NonSerialized]
+    public List<Action>
+        OnBegin = new List<Action> ();
 
-	public void Run() 
-	{
-		foreach(System.Action e in OnBegin) {
-			e.Invoke();
-		}
-	}
+    public bool IsReady {
+        get {
+            foreach (PromiseUnitBase u in mUnits) {
+                if (u.IsReady == false) {
+                    return false;
+                }
+            }
 
-	public Promise Begin(System.Action fn) {
-		OnBegin.Add (fn);
-		return this;
-	}
+            return true;
+        }
+    }
 
-	public Promise Then<C, P>(System.Action<P> fn) where C : PromiseUnit<P>
-	{
-		C unit = GetComponent<C> ();
+    public void Run ()
+    {
+        foreach (Action e in OnBegin) {
+            e.Invoke ();
+        }
+    }
 
-		if (unit == null) {
-			return this;
-		}
+    public Promise Begin (Action fn)
+    {
+        OnBegin.Add (fn);
+        return this;
+    }
 
-		unit.AfterReady.Add (fn);
-		if (!mUnits.Contains(unit)){
-			mUnits.Add(unit);
-		}
+    public Promise Then<C, P> (Action<P> fn) where C : PromiseUnit<P>
+    {
+        C unit = GetComponent<C> ();
+        if (unit == null) {
+            return this;
+        }
 
-		return this;
-	}
+        unit.AfterReady.Add (fn);
+        AddUnitList (unit);
 
-	public Promise WhenError<C>(System.Action fn) where C : PromiseUnitBase
-	{
-		C unit = GetComponent<C> ();
-		
-		if (unit == null) {
-			return this;
-		}
-		
-		unit.OnError.Add (fn);
-		if (!mUnits.Contains(unit)){
-			mUnits.Add(unit);
-		}
-		
-		return this;
-	}
+        return this;
+    }
+
+    public Promise WhenError<C> (Action fn) where C : PromiseUnitBase
+    {
+        C unit = GetComponent<C> ();
+        if (unit == null) {
+            return this;
+        }
+        
+        unit.OnError.Add (fn);
+        AddUnitList (unit);
+        
+        return this;
+    }
+
+    private void AddUnitList (PromiseUnitBase unit)
+    {
+        if (!mUnits.Contains (unit)) {
+            mUnits.Add (unit);
+        }
+    }
 }

@@ -4,41 +4,55 @@ using System.Collections;
 [RequireComponent(typeof(Promise))]
 [RequireComponent(typeof(FirstThing))]
 [RequireComponent(typeof(SecondThing))]
-public class MainMenu : MonoBehaviour {
-	private Promise mPromise = null;
-	private FirstThing mFirst = null;
-	private SecondThing mSecond = null;
+public class MainMenu : MonoBehaviour
+{
+    private Promise mPromise = null;
+    private FirstThing mFirst = null;
+    private SecondThing mSecond = null;
 
-	void Awake() {
-		mPromise = GetComponent<Promise>();
-		mFirst = GetComponent<FirstThing> ();
-		mSecond = GetComponent<SecondThing>();
-	}
-	
-	void Start () {
-		mPromise.
-			Begin (First).
-			Then<FirstThing, int>(AfterFirst).
-			Then<SecondThing, string>(AfterSecond);
-	}
+    void Awake ()
+    {
+        mPromise = GetComponent<Promise> ();
+        mFirst = GetComponent<FirstThing> ();
+        mSecond = GetComponent<SecondThing> ();
+    }
+    
+    void Start ()
+    {
+        mPromise.
+            Begin (First).
+            Then<FirstThing, int> (AfterFirst).
+            Then<SecondThing, string> (AfterSecond);
+    }
 
-	void OnGUI() {
-		if(GUI.Button(new Rect(10, 10, 300, 50), "Strar Promise Pattern Test")) {
-			mPromise.Run();
-		}
-	}
+    void Update ()
+    {
+        if (mPromise.IsReady) {
+            Debug.Log ("mPromise.IsReady");
+        }
+    }
 
-	void First() {
-		mFirst.Run ();
-	}
+    void OnGUI ()
+    {
+        if (GUI.Button (new Rect (10, 10, 300, 50), "Strar Promise Pattern Test")) {
+            mPromise.Run ();
+        }
+    }
 
-	void AfterFirst(int param) {
-		Debug.Log ("AfterFirst : " + param.ToString());
-		mSecond.Run ();
-	}
+    void First ()
+    {
+        mFirst.Run ();
+    }
 
-	void AfterSecond(string param) {
-		Debug.Log ("AfterSecond : " + param);
-	}
+    void AfterFirst (int param)
+    {
+        Debug.Log ("AfterFirst : " + param.ToString ());
+        mSecond.Run ();
+    }
+
+    void AfterSecond (string param)
+    {
+        Debug.Log ("AfterSecond : " + param);
+    }
 }
 
