@@ -27,9 +27,7 @@ public class MainMenu : MonoBehaviour
 
     void Update ()
     {
-        if (mPromise.IsReady) {
-            Debug.Log ("mPromise.IsReady");
-        }
+
     }
 
     void OnGUI ()
